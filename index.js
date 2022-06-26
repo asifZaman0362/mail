@@ -44,6 +44,21 @@ app.get('/register', (req, res) => {
     return res.status(200).render('register');
 })
 
+app.post('/register', async (req, res) => {
+    const username = req.body.username;
+    const usertype = req.body.usertype;
+    const password = auth.getPasswordHash(req.body.password);
+    const phone = req.body.phone;
+    const email = req.body.email;
+    if (database.get_user(username, usertype)) {
+        return res.status(409).redirect('/register?code=409');
+    } else {
+        if (database.createUser(username, usertype, password, email, phone))
+            return res.status(200).redirect('/login');
+        else return res.status(500).redirect('/register?code=500');
+    }
+});
+
 app.get('/logout', (req, res) => {
     req.cookies['jsonwebtoken'] = null;
     return res.status(200).redirect('/login');
@@ -55,6 +70,9 @@ app.post('/login', async (req, res) => {
     const password = req.body.password;
     if (auth.verifyPassword(username, usertype, password)) {
         res.cookie('jsonwebtoken', auth.generateToken(username, usertype), { maxAge: 60*60*24*60, httpOnly: true });
+        return res.status(200).redirect('/');
+    } else {
+        return res.status(401).redirect('/login?code=401');
     }
 });
 

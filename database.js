@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
     password: String, 
     phone_number: String,
     email_address: String, 
-    user_type: String 
+    usertype: String 
 });
 
 const retailerSchema = new mongoose.Schema({
@@ -44,8 +44,24 @@ async function createConnection() {
     return mongoose.connect('mongodb://localhost:27017');
 }
 
-async function get_user(username, user_type) {
-    return models.User.findOne({ username: username, user_type: user_type });
+async function get_user(username, usertype) {
+    return models.User.findOne({ username: username, usertype: usertype });
+}
+
+async function createUser(username, usertype, password, email, phone) {
+    try {
+        const user = new models.User({
+            username,
+            usertype,
+            password,
+            email,
+            phone
+        });
+        return user.save();
+    } catch (error) {
+        console.error('error: ', error);
+        return null;
+    }
 }
 
 module.exports = {
