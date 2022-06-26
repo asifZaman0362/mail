@@ -34,10 +34,10 @@ const productSchema = new mongoose.Schema({
 });
 
 const models = {
-    User: mongoose.Model('User', userSchema),
-    Distributor: mongoose.Model('Distributor', distributorSchema),
-    Retailer: mongoose.Model('Retailer', retailerSchema),
-    Product: mongoose.Model('Product', productSchema)
+    User: mongoose.model('User', userSchema),
+    Distributor: mongoose.model('Distributor', distributorSchema),
+    Retailer: mongoose.model('Retailer', retailerSchema),
+    Product: mongoose.model('Product', productSchema)
 };
 
 async function createConnection() {
@@ -46,4 +46,10 @@ async function createConnection() {
 
 async function get_user(username, user_type) {
     return models.User.findOne({ username: username, user_type: user_type });
+}
+
+module.exports = {
+    models,
+    createConnection,
+    get_user
 }

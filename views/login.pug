@@ -1,0 +1,17 @@
+include ./head.pug
+body 
+    .parent-container
+        form#login-form(name="login-form", method="POST", action="/login")
+            h1.form-header Login
+            select#userselect(name="usertype") Select User
+                option(value="Admin") Admin
+                option(value="Retailer") Retailer
+                option(value="Distributor") Distributor
+            .input-wrapper 
+                label(for="username") Username
+                input(type="text", name="username", placeholder="Enter username")
+            .input-wrapper 
+                label(for="password") Password
+                input(type="password", name="password", placeholder="Enter password")
+            .button-container 
+                input(type="submit", value="Log In")
