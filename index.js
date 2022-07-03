@@ -76,6 +76,32 @@ app.post('/login', async (req, res) => {
     }
 });
 
+app.post('/add_retailer', auth.checkAccess, async (req, res) => {
+    const name = req.body.name;
+    const email = req.body.email;
+    const phone = req.body.phone;
+    const address = req.body.address;
+    database.createRetailer(name, email, phone, address);
+});
+
+app.post('/add_distributor', auth.checkAccess, async (req, res) => {
+    const name = req.body.name;
+    const email = req.body.email;
+    const phone = req.body.phone;
+    const address = req.body.address;
+    database.createDistributor(name, email, phone, address);
+});
+
+app.post('/add_product', auth.checkAccess, async (req, res) => {
+    const name = req.body.name;
+    const id = req.body.id;
+    const mfg_cost = req.body.manufacturing_cost;
+    const mfr = req.body.manufacturer_name;
+    const price = req.body.retail_price;
+    const stock = req.body.stock;
+    database.createProduct(name, id, mfg_cost, mfr, stock, price);
+});
+
 app.get('*', (req, res) => {
     return res.status(404).render('404', { title: '404: Page not found!' });
 });

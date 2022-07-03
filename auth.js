@@ -31,11 +31,15 @@ async function generateToken(username, usertype) {
 }
 
 async function checkAccess(req, res, next) {
-    const token = req.cookies['jsonwebtoken'].split('=')[1];
-    const accessLevel = req.session.accessMode;
-    const tokenLevel = getAccessLevel(token);
-    if (tokenLevel && tokenLevel == accessLevel) return next();
-    else return res.status(401).redirect('/login?code=401');
+    if (req.cookies['jsonwebtoken']) {
+        const token = req.cookies['jsonwebtoken'].split('=')[1];
+        const accessLevel = req.session.accessMode;
+        const tokenLevel = getAccessLevel(token);
+        if (tokenLevel && tokenLevel == accessLevel) return next();
+        else return res.status(401).redirect('/login?code=401');
+    } else {
+        return res.status(401).redirect('/login?code=401');
+    }
 }
 
 async function getAccessLevel(token) {

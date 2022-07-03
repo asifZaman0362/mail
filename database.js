@@ -28,8 +28,6 @@ const productSchema = new mongoose.Schema({
     manufacture_cost: Number,
     retail_price: Number,
     manufacturer: String,
-    batch_number: String,
-    mfg_date: Date,
     stock: Number
 });
 
@@ -64,8 +62,58 @@ async function createUser(username, usertype, password, email, phone) {
     }
 }
 
+async function createRetailer(name, email, phone, address) {
+    try {
+        const retailer = new models.Retailer({
+            name: name,
+            email_address: email,
+            phone_number: phone,
+            address: address
+        });
+        return retailer.save();
+    } catch (error) {
+        console.error('error: ', error);
+        return null;
+    }
+}
+
+async function createDistributor(name, email, phone, address) {
+    try {
+        const distributor = new models.Distributor({
+            name: name,
+            email_address: email,
+            phone_number: phone,
+            address: address
+        });
+        return distributor.save();
+    } catch (error) {
+        console.error('error: ', error);
+        return null;
+    }
+}
+
+async function createProduct(name, id, mfg_cost, mfr, stock, mfg_cost, retail_price) {
+    try {
+        const product = new models.Product({
+            product_name: name,
+            product_id: id,
+            retail_price: retail_price,
+            manufacture_cost: mfg_cost,
+            stock: stock,
+            manufacturer: mfr
+        });
+        return product.save();
+    } catch (error) {
+        console.error('error: ', error);
+        return null;
+    }
+}
+
 module.exports = {
     models,
     createConnection,
-    get_user
+    get_user,
+    createProduct,
+    createRetailer,
+    createDistributor
 }

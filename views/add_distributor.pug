@@ -1,0 +1,19 @@
+include ./head.pug
+body 
+    .parent-container
+        form#distributor-form(action="add_distributor", name="distributor_form")
+            h1.form-header Add new distributor
+            .input-wrapper 
+                label(for="name") Name
+                input(type="text", name="name", placeholder="Enter distributor name")
+            .input-wrapper 
+                label(for="email") Email
+                input(type="email", name="email", placeholder="Enter email address")
+            .input-wrapper 
+                label(for="phone") Phone
+                input(type="phone", name="phone", placeholder="Enter phone number")
+            .input-wrapper 
+                label(for="address") Address
+                input(type="text", name="address", placeholder="Enter distributor address")
+            .button-container 
+                input(type="submit", value="Add distributor")
