@@ -47,14 +47,16 @@ async function get_user(username, usertype) {
 }
 
 async function createUser(username, usertype, password, email, phone) {
+    console.log(username, password, usertype, email, phone);
     try {
         const user = new models.User({
-            username,
-            usertype,
-            password,
-            email,
-            phone
+            username: username,
+            usertype: usertype,
+            password: password,
+            email_address: email,
+            phone_number: phone
         });
+        console.log(user);
         return user.save();
     } catch (error) {
         console.error('error: ', error);
@@ -113,6 +115,7 @@ module.exports = {
     models,
     createConnection,
     get_user,
+    createUser,
     createProduct,
     createRetailer,
     createDistributor

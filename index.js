@@ -22,16 +22,19 @@ app.set('view engine', 'pug');
 
 app.get('/', async (req, res) => {
     try {
-        const token = req.cookies['jsonwebtoken'].split('=')[1];
-        const accessLevel = auth.getAccessLevel(token);
+        let token = '';
+        if (req.cookies['jsonwebtoken'])
+            token = req.cookies['jsonwebtoken'];
+        console.log('token: ', token);
+        const accessLevel = await auth.getAccessLevel(token);
         if (!accessLevel) return res.status(401).redirect('/login');
-        else if (accessLevel == "admin") {
+        else if (accessLevel === "admin") {
             return res.status(200).redirect('/admin');
         } else {
             return res.status(200).redirect('/editor');
         }
     } catch (error) {
-        console.error('error: ', error);
+        console.error('error getting token');
         return res.status(401).redirect('/login');
     }
 });
@@ -47,14 +50,17 @@ app.get('/register', (req, res) => {
 app.post('/register', async (req, res) => {
     const username = req.body.username;
     const usertype = req.body.usertype;
-    const password = auth.getPasswordHash(req.body.password);
+    const password = await auth.getPasswordHash(req.body.password);
     const phone = req.body.phone;
     const email = req.body.email;
-    if (database.get_user(username, usertype)) {
+    if (await database.get_user(username, usertype)) {
+        console.log('user already exists!');
         return res.status(409).redirect('/register?code=409');
     } else {
-        if (database.createUser(username, usertype, password, email, phone))
+        if (await database.createUser(username, usertype, password, email, phone)) {
+            console.log('user created sucessfully');
             return res.status(200).redirect('/login');
+        }
         else return res.status(500).redirect('/register?code=500');
     }
 });
@@ -68,8 +74,11 @@ app.post('/login', async (req, res) => {
     const username = req.body.username;
     const usertype = req.body.usertype;
     const password = req.body.password;
-    if (auth.verifyPassword(username, usertype, password)) {
-        res.cookie('jsonwebtoken', auth.generateToken(username, usertype), { maxAge: 60*60*24*60, httpOnly: true });
+    if (await auth.verifyPassword(username, usertype, password)) {
+        let token = await auth.generateToken(username, usertype);
+        res.cookie('jsonwebtoken', token, { maxAge: 60*60*24*60, httpOnly: true });
+        console.log(res.cookies, token);
+        console.log('logged in');
         return res.status(200).redirect('/');
     } else {
         return res.status(401).redirect('/login?code=401');
@@ -81,7 +90,7 @@ app.post('/add_retailer', auth.checkAccess, async (req, res) => {
     const email = req.body.email;
     const phone = req.body.phone;
     const address = req.body.address;
-    database.createRetailer(name, email, phone, address);
+    await database.createRetailer(name, email, phone, address);
 });
 
 app.post('/add_distributor', auth.checkAccess, async (req, res) => {
@@ -89,7 +98,7 @@ app.post('/add_distributor', auth.checkAccess, async (req, res) => {
     const email = req.body.email;
     const phone = req.body.phone;
     const address = req.body.address;
-    database.createDistributor(name, email, phone, address);
+    await database.createDistributor(name, email, phone, address);
 });
 
 app.post('/add_product', auth.checkAccess, async (req, res) => {
@@ -99,7 +108,7 @@ app.post('/add_product', auth.checkAccess, async (req, res) => {
     const mfr = req.body.manufacturer_name;
     const price = req.body.retail_price;
     const stock = req.body.stock;
-    database.createProduct(name, id, mfg_cost, mfr, stock, price);
+    await database.createProduct(name, id, mfg_cost, mfr, stock, price);
 });
 
 app.get('*', (req, res) => {

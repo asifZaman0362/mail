@@ -3,8 +3,9 @@ const jwt = require('jsonwebtoken');
 const database = require('./database');
 
 async function getPasswordHash(password) {
-    if (password)
-        return argon2.hash(password, argon2.defaults);
+    if (password) {
+        return await argon2.hash(password, argon2.defaults);
+    }
     else {
         console.error("Failed to compute hash: No password given!");
         return null;
@@ -12,12 +13,18 @@ async function getPasswordHash(password) {
 }
 
 async function verifyPassword(username, usertype, password) {
-    if (password) {
-        const hash = database.get_user(username, usertype).password;
-        return argon2.verify(hash, password, argon2.defaults);
+    try {
+        const entry = await database.get_user(username, usertype);
+        let hash = entry.password;
+        if (hash)
+            return argon2.verify(hash, password, argon2.defaults);
+        else {
+            console.log("User doesn't exist!");
+            return false;
+        }
     }
-    else {
-        console.error("Failed to verify password: Password is empty!");
+    catch(error) {
+        console.error(error);
         return null;
     }
 }
