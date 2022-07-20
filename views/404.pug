@@ -1,7 +1,9 @@
 include ./head.pug
 body
-    .parent-container
-        .not-found-container
-            h2 Error 
+    include ./header.pug
+    div.content.padded#notfound
+        section
             h1 404
-            p We looked far and wide but couldn't locate the page you're looking for on our server. It may have been relocated to another url or may have been removed altogether. Tough luck :(
+            h2 Page not found!
+            p We searched far and wide but couldn't find the page you requested. It may have renamed, moved to a different section or it just doesn't exist on this server at all, unless you were actually looking for this specific <i><b>"Page not found"</i></b> page; in which case it does exist and you've definitely found it. Bravo!
+            a(href="/") Homepage

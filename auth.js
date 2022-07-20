@@ -37,17 +37,18 @@ async function generateToken(username, usertype) {
     return jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '5184000s' });
 }
 
-async function checkAccess(req, res, next) {
-    if (req.cookies['jsonwebtoken']) {
-        const token = req.cookies['jsonwebtoken'].split('=')[1];
-        const accessLevel = req.session.accessMode;
-        const tokenLevel = getAccessLevel(token);
-        if (tokenLevel && tokenLevel == accessLevel) return next();
-        else return res.status(401).redirect('/login?code=401');
-    } else {
-        return res.status(401).redirect('/login?code=401');
-    }
-}
+// async function checkAccess(req, res, next) {
+//     if (req.cookies['jsonwebtoken']) {
+//         const token = req.cookies['jsonwebtoken'];
+//         const accessLevel = req.session.usertype;
+//         const tokenLevel = await getAccessLevel(token);
+//         console.log('token:', tokenLevel, 'session:', accessLevel);
+//         if (tokenLevel && tokenLevel == accessLevel) return next();
+//         else return res.status(401).redirect('/login?code=401');
+//     } else {
+//         return res.status(401).redirect('/login?code=402');
+//     }
+// }
 
 async function getAccessLevel(token) {
     const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
@@ -58,7 +59,7 @@ async function getAccessLevel(token) {
 module.exports = {
     getAccessLevel,
     getPasswordHash,
-    checkAccess,
+    // checkAccess,
     generateToken,
     verifyPassword
 }

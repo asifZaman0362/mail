@@ -1,4 +1,5 @@
 const express = require('express');
+const session = require('express-session');
 const https = require('https');
 const fs = require('fs');
 const cookieParser = require('cookie-parser');
@@ -14,6 +15,11 @@ database.createConnection();
 
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(session({
+    resave: false,
+    saveUninitialized: false,
+    secret: '6HBnWF56qv@nME'
+}));
 
 app.use(express.static('public'));
 
@@ -27,6 +33,10 @@ app.get('/', async (req, res) => {
             token = req.cookies['jsonwebtoken'];
         console.log('token: ', token);
         const accessLevel = await auth.getAccessLevel(token);
+        req.session.user = 'user';
+        req.session.usertype = accessLevel;
+        req.session.success = "Successfully logged in as <b>" + 'user' + "</b>!";
+        console.log(req.session.usertype);
         if (!accessLevel) return res.status(401).redirect('/login');
         else if (accessLevel === "admin") {
             return res.status(200).redirect('/admin');
@@ -34,7 +44,7 @@ app.get('/', async (req, res) => {
             return res.status(200).redirect('/editor');
         }
     } catch (error) {
-        console.error('error getting token');
+        console.error(error);
         return res.status(401).redirect('/login');
     }
 });
@@ -65,8 +75,17 @@ app.post('/register', async (req, res) => {
     }
 });
 
+app.get('/editor', /*auth.checkAccess,*/ async (req, res) => {
+    return res.render('editor.pug');
+});
+
+app.get('/admin', /*auth.checkAccess,*/ async (req, res) => {
+    return res.render('editor.pug');
+});
+
 app.get('/logout', (req, res) => {
-    req.cookies['jsonwebtoken'] = null;
+    res.clearCookie('jsonwebtoken');
+    req.session.destroy();
     return res.status(200).redirect('/login');
 });
 
@@ -85,7 +104,7 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.post('/add_retailer', auth.checkAccess, async (req, res) => {
+app.post('/add_retailer', /*auth.checkAccess,*/ async (req, res) => {
     const name = req.body.name;
     const email = req.body.email;
     const phone = req.body.phone;
@@ -93,7 +112,7 @@ app.post('/add_retailer', auth.checkAccess, async (req, res) => {
     await database.createRetailer(name, email, phone, address);
 });
 
-app.post('/add_distributor', auth.checkAccess, async (req, res) => {
+app.post('/add_distributor', /*auth.checkAccess,*/ async (req, res) => {
     const name = req.body.name;
     const email = req.body.email;
     const phone = req.body.phone;
@@ -101,7 +120,7 @@ app.post('/add_distributor', auth.checkAccess, async (req, res) => {
     await database.createDistributor(name, email, phone, address);
 });
 
-app.post('/add_product', auth.checkAccess, async (req, res) => {
+app.post('/add_product', /*auth.checkAccess,*/ async (req, res) => {
     const name = req.body.name;
     const id = req.body.id;
     const mfg_cost = req.body.manufacturing_cost;

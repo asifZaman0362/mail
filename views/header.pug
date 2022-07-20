@@ -1,0 +1,13 @@
+header
+    div.text
+        span Supply Chain Management
+    if username
+        div.account
+            div.account-info
+                span(id="account-type") #{usertype}
+                span(id="username") #{username}
+            a(href="/logout", title="Log Out")
+                i.fa-solid.fa-arrow-right-from-bracket
+    else
+        .account
+            span#account-type Not logged in
