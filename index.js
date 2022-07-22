@@ -121,7 +121,7 @@ app.post('/add_retailer', auth.is_editor, async (req, res) => {
 
 app.post('/add_product', auth.is_editor, async (req, res) => {
     let name = req.body.name;
-    let id = req.body.product_id;
+    let id = req.body.id;
     let cost = req.body.manufacturing_cost;
     let price = req.body.retail_price;
     let stock = req.body.stock;
@@ -137,6 +137,21 @@ app.get('/logout', (req, res) => {
     res.clearCookie('jsonwebtoken');
     req.session.destroy();
     return res.status(200).redirect('/login');
+});
+
+app.get('/list_product', auth.is_editor, async (req, res) => {
+    let products = await database.get_products();
+    return res.status(200).render('list_product.pug', {products: products});
+});
+
+app.get('/list_retailer', auth.is_editor, async (req, res) => {
+    let retailers = await database.get_retailers();
+    return res.status(200).render('list_retailer.pug', {retailers: retailers});
+});
+
+app.get('/list_distributor', auth.is_editor, async (req, res) => {
+    let distributors = await database.get_distributors();
+    return res.status(200).render('list_distributor.pug', {distributors: distributors});
 });
 
 app.post('/login', async (req, res) => {

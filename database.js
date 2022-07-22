@@ -24,7 +24,7 @@ const distributorSchema = new mongoose.Schema({
 });
 
 const productSchema = new mongoose.Schema({
-    product_id: Number,
+    product_id: String,
     product_name: String,
     manufacture_cost: Number,
     retail_price: Number,
@@ -145,8 +145,8 @@ async function createDistributor(name, email, phone, address) {
 async function createProduct(name, id, mfg_cost, mfr, stock, retail_price) {
     try {
         const product = new models.Product({
-            product_name: name,
             product_id: id,
+            product_name: name,
             retail_price: retail_price,
             manufacture_cost: mfg_cost,
             stock: stock,
@@ -159,10 +159,45 @@ async function createProduct(name, id, mfg_cost, mfr, stock, retail_price) {
     }
 }
 
+async function get_products() {
+    try {
+        return await models.Product.find();
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+async function get_distributors() {
+    try {
+        return await models.Distributor.find();
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+async function get_retailers() {
+    try {
+        return await models.Retailer.find();
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+async function get_users() {
+    try {
+        return await models.User.find();
+    } catch (err) {
+        console.error(err);
+    }
+}
+
 module.exports = {
     models,
     createConnection,
     get_user,
+    get_products,
+    get_retailers,
+    get_distributors,
     createUser,
     createProduct,
     createRetailer,
