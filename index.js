@@ -83,6 +83,56 @@ app.get('/admin', /*auth.checkAccess,*/ async (req, res) => {
     return res.render('editor.pug');
 });
 
+app.get('/add_product', async (req, res) => {
+    return res.render('add_product.pug');
+});
+
+app.get('/add_retailer', async (req, res) => {
+    return res.render('addretailer.pug');
+});
+
+app.get('/add_distributor', async (req, res) => {
+    return res.render('add_distributor.pug');
+});
+
+app.post('/add_distributor', async (req, res) => {
+    let name = req.body.name;
+    let address = req.body.address;
+    let email = req.body.email;
+    let phone = req.body.phone;
+    let result = await database.createDistributor(name, email, phone, address);
+    if (result != null) {
+        console.log('Added distributor: ', result);
+        return res.status(200).redirect('/admin');
+    }
+});
+
+app.post('/add_retailer', async (req, res) => {
+    let name = req.body.name;
+    let address = req.body.address;
+    let email = req.body.email;
+    let phone = req.body.phone;
+    let result = await database.createRetailer(name, email, phone, address);
+    if (result != null) {
+        console.log('Added retailer: ', result);
+        return res.status(200).redirect('/admin');
+    }
+});
+
+app.post('/add_product', async (req, res) => {
+    let name = req.body.name;
+    let id = req.body.product_id;
+    let cost = req.body.manufacturing_cost;
+    let price = req.body.retail_price;
+    let stock = req.body.stock;
+    let mname = req.body.manufacturer_name;
+    let result = await database.createProduct(name, id, cost, mname, stock, price);
+    if (result != null) {
+        console.log('Added product: ', result);
+        return res.status(200).redirect('/admin');
+    }
+});
+
 app.get('/logout', (req, res) => {
     res.clearCookie('jsonwebtoken');
     req.session.destroy();

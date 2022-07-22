@@ -1,25 +1,31 @@
 include ./head.pug
-body 
-    .parent-container
-        form#product-form(action="add_product", name="product_form")
-            h1.form-header Add new product
-            .input-wrapper 
-                label(for="name") Name
-                input(type="text", name="name", placeholder="Enter product name")
-            .input-wrapper 
-                label(for="product_id") Product ID
-                input(type="text", name="id", placeholder="Enter product ID")
-            .input-wrapper 
-                label(for="product_price") Manufacturing cost
-                input(type="number", name="manufacturing_cost", placeholder="Enter manufacturing cost")
-            .input-wrapper 
-                label(for="retail_price") Retail price
-                input(type="number", name="retail_price", placeholder="Enter retail price")
-            .input-wrapper 
-                label(for="stock") Product stock
-                input(type="number", name="stock", placeholder="Enter available stock")
-            .input-wrapper 
-                label(for="manufacturer_name") Product manufacturer
-                input(type="text", name="manufacturer_name", placeholder="Enter manufacturer name")
-            .button-container 
-                input(type="submit", value="Add product")
+body
+    include ./header.pug
+    include ./notification.pug
+    .content.centred
+        form.login-form(action="/add_product", method="post", name="product_form")
+            h1.formheader Add product
+            .horizontal-input-row
+                .input-field
+                    label(for="name") Name
+                    input(type="text", name="name", placeholder="Enter product name")
+                .input-field
+                    label(for="id") Product ID
+                    input(type="text", name="id", placeholder="Enter product ID")
+            .horizontal-input-row
+                .input-field
+                    label(for="manufacturing_cost") Manufacturing cost
+                    input(type="number", name="manufacturing_cost", placeholder="Enter manufacturing cost")
+                .input-field
+                    label(for="retail_price") Retail price
+                    input(type="number", name="retail_price", placeholder="Enter retail price")
+            .horizontal-input-row
+                .input-field
+                    label(for="stock") Product stock
+                    input(type="number", name="stock", placeholder="Enter available stock")
+                .input-field
+                    label(for="manufacturer_name") Product manufacturer
+                    input(type="text", name="manufacturer_name", placeholder="Enter manufacturer name")
+            button.button(onclick="")
+                span Add product
+                i.fa-solid.fa-user-plus

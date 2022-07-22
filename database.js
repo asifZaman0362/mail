@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const uuid = require('uuid');
 
 const userSchema = new mongoose.Schema({ 
     username: String, 
@@ -31,11 +32,32 @@ const productSchema = new mongoose.Schema({
     stock: Number
 });
 
+const purchaseSchema = new mongoose.Schema({
+    purchase_id: String,
+    product_id: Number,
+    quantity: Number,
+    rate: Number,
+    discount: Number,
+    price: Number,
+    transaction_id: Number
+});
+
+const transactionSchema = new mongoose.Schema({
+    transaction_id: String,
+    purchase_id: Array,
+    seller_id: Number,
+    buyer_id: Number,
+    cost: Number,
+    date: Date
+});
+
 const models = {
     User: mongoose.model('User', userSchema),
     Distributor: mongoose.model('Distributor', distributorSchema),
     Retailer: mongoose.model('Retailer', retailerSchema),
-    Product: mongoose.model('Product', productSchema)
+    Product: mongoose.model('Product', productSchema),
+    Purchase: mongoose.model('Purchase', purchaseSchema),
+    Transaction: mongoose.model('Transaction', transactionSchema)
 };
 
 async function createConnection() {
@@ -44,6 +66,32 @@ async function createConnection() {
 
 async function get_user(username, usertype) {
     return models.User.findOne({ username: username, usertype: usertype });
+}
+
+async function createPurchase(product_id, quantity, discount, rate, price, transaction_id) {
+    const id = uuid.v5();
+    const purchase = new models.Purchase({
+        purchase_id: id,
+        product_id: product_id,
+        quantity: quantity,
+        discount: discount,
+        rate: rate,
+        price: price,
+        transaction_id: transaction_id
+    });
+    return purchase.save();
+}
+
+async function createTransaction(seller, buyer, cost, date) {
+    const id = uuid.v5();
+    const transaction = new models.Transaction({
+        transaction_id: id,
+        seller_id: seller,
+        buyer_id: buyer,
+        cost: cost,
+        date: date
+    });
+    return transaction.save();
 }
 
 async function createUser(username, usertype, password, email, phone) {
@@ -94,7 +142,7 @@ async function createDistributor(name, email, phone, address) {
     }
 }
 
-async function createProduct(name, id, mfg_cost, mfr, stock, mfg_cost, retail_price) {
+async function createProduct(name, id, mfg_cost, mfr, stock, retail_price) {
     try {
         const product = new models.Product({
             product_name: name,

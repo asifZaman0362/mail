@@ -1,19 +1,24 @@
 include ./head.pug
-body 
-    .parent-container
-        form#retailer-form(action="add_retailer", name="retailer_form")
-            h1.form-header Add new retailer
-            .input-wrapper 
-                label(for="name") Name
-                input(type="text", name="name", placeholder="Enter retailer name")
-            .input-wrapper 
-                label(for="email") Email
-                input(type="email", name="email", placeholder="Enter email address")
-            .input-wrapper 
-                label(for="phone") Phone
-                input(type="phone", name="phone", placeholder="Enter phone number")
-            .input-wrapper 
-                label(for="address") Address
-                input(type="text", name="address", placeholder="Enter retailer address")
-            .button-container 
-                input(type="submit", value="Add retailer")
+body
+    include ./header.pug
+    include ./notification.pug
+    .content.centred
+        form.login-form(action="/add_retailer", method="post", name="retailer_form")
+            h1.formheader Add Retailer
+            .horizontal-input-row
+                .input-field
+                    label(for="name") Name
+                    input(type="text", name="name", placeholder="Enter retailer name")
+                .input-field
+                    label(for="email") Email
+                    input(type="email", name="email", placeholder="Enter email address")
+            .horizontal-input-row
+                .input-field
+                    label(for="phone") Phone
+                    input(type="phone", name="phone", placeholder="Enter phone number")
+                .input-field
+                    label(for="address") Address
+                    input(type="text", name="address", placeholder="Enter retailer address")
+            button.button(onclick="")
+                span Add retailer
+                i.fa-solid.fa-user-plus
