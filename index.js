@@ -75,27 +75,27 @@ app.post('/register', async (req, res) => {
     }
 });
 
-app.get('/editor', /*auth.checkAccess,*/ async (req, res) => {
+app.get('/editor', auth.is_editor, async (req, res) => {
     return res.render('editor.pug');
 });
 
-app.get('/admin', /*auth.checkAccess,*/ async (req, res) => {
+app.get('/admin', auth.is_editor, async (req, res) => {
     return res.render('editor.pug');
 });
 
-app.get('/add_product', async (req, res) => {
+app.get('/add_product', auth.is_editor, async (req, res) => {
     return res.render('add_product.pug');
 });
 
-app.get('/add_retailer', async (req, res) => {
+app.get('/add_retailer', auth.is_editor, async (req, res) => {
     return res.render('addretailer.pug');
 });
 
-app.get('/add_distributor', async (req, res) => {
+app.get('/add_distributor', auth.is_editor, async (req, res) => {
     return res.render('add_distributor.pug');
 });
 
-app.post('/add_distributor', async (req, res) => {
+app.post('/add_distributor', auth.is_editor, async (req, res) => {
     let name = req.body.name;
     let address = req.body.address;
     let email = req.body.email;
@@ -107,7 +107,7 @@ app.post('/add_distributor', async (req, res) => {
     }
 });
 
-app.post('/add_retailer', async (req, res) => {
+app.post('/add_retailer', auth.is_editor, async (req, res) => {
     let name = req.body.name;
     let address = req.body.address;
     let email = req.body.email;
@@ -119,7 +119,7 @@ app.post('/add_retailer', async (req, res) => {
     }
 });
 
-app.post('/add_product', async (req, res) => {
+app.post('/add_product', auth.is_editor, async (req, res) => {
     let name = req.body.name;
     let id = req.body.product_id;
     let cost = req.body.manufacturing_cost;
