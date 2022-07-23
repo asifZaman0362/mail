@@ -76,23 +76,23 @@ app.post('/register', async (req, res) => {
 });
 
 app.get('/editor', auth.is_editor, async (req, res) => {
-    return res.render('editor.pug');
+    return res.render('editor.pug', {username: req.session.username, usertype: req.session.usertype});
 });
 
 app.get('/admin', auth.is_editor, async (req, res) => {
-    return res.render('editor.pug');
+    return res.render('editor.pug', {username: req.session.username, usertype: req.session.usertype});
 });
 
 app.get('/add_product', auth.is_editor, async (req, res) => {
-    return res.render('add_product.pug');
+    return res.render('add_product.pug', {username: req.session.username, usertype: req.session.usertype});
 });
 
 app.get('/add_retailer', auth.is_editor, async (req, res) => {
-    return res.render('addretailer.pug');
+    return res.render('addretailer.pug', {username: req.session.username, usertype: req.session.usertype});
 });
 
 app.get('/add_distributor', auth.is_editor, async (req, res) => {
-    return res.render('add_distributor.pug');
+    return res.render('add_distributor.pug', {username: req.session.username, usertype: req.session.usertype});
 });
 
 app.post('/add_distributor', auth.is_editor, async (req, res) => {
@@ -141,17 +141,17 @@ app.get('/logout', (req, res) => {
 
 app.get('/list_product', auth.is_editor, async (req, res) => {
     let products = await database.get_products();
-    return res.status(200).render('list_product.pug', {products: products});
+    return res.status(200).render('list_product.pug', {products: products, username: req.session.username, usertype: req.session.usertype});
 });
 
 app.get('/list_retailer', auth.is_editor, async (req, res) => {
     let retailers = await database.get_retailers();
-    return res.status(200).render('list_retailer.pug', {retailers: retailers});
+    return res.status(200).render('list_retailer.pug', {retailers: retailers, username: req.session.username, usertype: req.session.usertype});
 });
 
 app.get('/list_distributor', auth.is_editor, async (req, res) => {
     let distributors = await database.get_distributors();
-    return res.status(200).render('list_distributor.pug', {distributors: distributors});
+    return res.status(200).render('list_distributor.pug', {distributors: distributors, username: req.session.username, usertype: req.session.usertype});
 });
 
 app.post('/login', async (req, res) => {
@@ -169,23 +169,25 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.post('/add_retailer', /*auth.checkAccess,*/ async (req, res) => {
+app.post('/add_retailer', auth.is_editor, async (req, res) => {
     const name = req.body.name;
     const email = req.body.email;
     const phone = req.body.phone;
     const address = req.body.address;
     await database.createRetailer(name, email, phone, address);
+    return res.status(200).redirect('/editor');
 });
 
-app.post('/add_distributor', /*auth.checkAccess,*/ async (req, res) => {
+app.post('/add_distributor', auth.is_editor, async (req, res) => {
     const name = req.body.name;
     const email = req.body.email;
     const phone = req.body.phone;
     const address = req.body.address;
     await database.createDistributor(name, email, phone, address);
+    return res.status(200).redirect('/editor');
 });
 
-app.post('/add_product', /*auth.checkAccess,*/ async (req, res) => {
+app.post('/add_product', auth.is_editor, async (req, res) => {
     const name = req.body.name;
     const id = req.body.id;
     const mfg_cost = req.body.manufacturing_cost;
@@ -193,10 +195,22 @@ app.post('/add_product', /*auth.checkAccess,*/ async (req, res) => {
     const price = req.body.retail_price;
     const stock = req.body.stock;
     await database.createProduct(name, id, mfg_cost, mfr, stock, price);
+    return res.status(200).redirect('/editor');
+});
+
+app.get('/list_transaction', auth.is_editor, async (req, res) => {
+    const list = await database.get_transactions();
+    return res.status(200).render('list_transaction.pug', {list: list, username: req.session.username, usertype: req.session.usertype});
+});
+
+app.get('/view_transaction', auth.is_editor, async (req, res) => {
+    const id = req.body.id;
+    const transaction = await database.get_transaction_by_id(id);
+    res.status(200).render('transaction_view.pug', { transaction: transaction, username: req.session.username, usertype: req.session.usertype });
 });
 
 app.get('*', (req, res) => {
-    return res.status(404).render('404', { title: '404: Page not found!' });
+    return res.status(404).render('404', { title: '404: Page not found!', username: req.session.username, usertype: req.session.usertype });
 });
 
 https

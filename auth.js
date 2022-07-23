@@ -41,7 +41,11 @@ async function is_editor(req, res, next) {
     if (req.cookies['jsonwebtoken']) {
         const token = req.cookies['jsonwebtoken'];
         const tokenLevel = await getAccessLevel(token);
-        if (tokenLevel === 'Admin') return next();
+        if (tokenLevel === 'Admin') {
+            req.session.username = await getUsername(token);
+            req.session.usertype = tokenLevel;
+            return next();
+        }
         else return res.status(401).redirect('/login?code=401');
     } else return res.status(401).redirect('/login?code=401');
 }
@@ -62,6 +66,12 @@ async function checkAccess(req, res, next) {
 async function getAccessLevel(token) {
     const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
     if (decoded) return decoded.usertype;
+    else return null;
+}
+
+async function getUsername(token) {
+    const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
+    if (decoded) return decoded.username;
     else return null;
 }
 

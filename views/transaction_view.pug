@@ -1,0 +1,12 @@
+include ./head.pug
+body
+    include ./header.pug
+    include ./notification.pug
+    .content.padded.filled
+        .panel
+            a.panel-link(href="/editor")
+                h1.panel-heading
+                    i.fa-solid.fa-angle-left
+                    span Editor Panel
+            h1.section-heading Transaction ID: 203403
+            include ./transaction.pug

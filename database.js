@@ -44,7 +44,6 @@ const purchaseSchema = new mongoose.Schema({
 
 const transactionSchema = new mongoose.Schema({
     transaction_id: String,
-    purchase_id: Array,
     seller_id: Number,
     buyer_id: Number,
     cost: Number,
@@ -191,6 +190,27 @@ async function get_users() {
     }
 }
 
+async function get_transactions() {
+    try {
+        return await models.Transaction.find();
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+async function get_transaction_by_id(id) {
+    try {
+        const purchases = models.Purchase.find({ transaction_id: id });
+        const transaction = models.Transaction.findOne({ transaction_id: id });
+        return {
+            purchases: purchases,
+            transaction: transaction
+        };
+    } catch (err) {
+        console.error(err);
+    }
+}
+
 module.exports = {
     models,
     createConnection,
@@ -201,5 +221,8 @@ module.exports = {
     createUser,
     createProduct,
     createRetailer,
-    createDistributor
+    createDistributor,
+    createTransaction,
+    get_transactions,
+    get_transaction_by_id
 }

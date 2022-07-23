@@ -867,3 +867,26 @@ tr:nth-child(even) {
 .select-text span {
     flex-grow: 1;
 }
+
+.receipt {
+    background: var(--col-card-bg);
+    padding: var(--padding-internal);
+    border-radius: 5px;
+}
+
+#bill-table {
+    border: 1px solid var(--col-fg);
+    border-radius: 5px;
+    border-spacing: 0;
+}
+
+#bill-table th, #bill-table td {
+    border-right: 1px solid var(--col-darker);
+    border-bottom: 1px solid var(--col-darker);
+    margin: 0;
+}
+
+#bill-table th:last-child, #bill-table td:last-child {
+    border: none;
+    border-bottom: 1px solid var(--col-darker);
+}
