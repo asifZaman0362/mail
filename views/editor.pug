@@ -47,7 +47,28 @@ body
                     a(href="add_product")
                         i(class="fa-solid fa-box")
                         span Add Product
+            section#transactions
+                div.section-heading-container
+                    h2.section-heading Manage Transactions
+                    hr
+                div.button-row
+                    a(href="list_transaction")
+                        i(class="fa-solid fa-box")
+                        span List Transaction
+                    a(href="list_transaction?edit=true")
+                        i(class="fa-solid fa-box")
+                        span Edit Transaction
+                    a(href="add_transaction")
+                        i(class="fa-solid fa-box")
+                        span Add Transaction
             section#advanced
                 div.section-heading-container
                     h2.section-heading Database Settings
                     hr
+                div.button-row
+                    div.button
+                        span Drop Database
+                    div.button
+                        span Add Admin
+                    div.button
+                        span Remove Admin

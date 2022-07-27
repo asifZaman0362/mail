@@ -90,7 +90,8 @@ async function createTransaction(seller, buyer, cost, date) {
         cost: cost,
         date: date
     });
-    return transaction.save();
+    if (await transaction.save()) return id;
+    else return null;
 }
 
 async function createUser(username, usertype, password, email, phone) {
@@ -190,6 +191,29 @@ async function get_users() {
     }
 }
 
+async function get_bill(id) {
+    let purchases_list;
+    try {
+        purchases_list = []
+        const {purchases, transaction} = await get_transaction_by_id(id);
+        for (purchase of purchases) {
+            const product = models.Product.findOne({product_id: purchase.product_id});
+            purchases_list.append({
+                product_id: purchase.product_id,
+                product_name: product.product_name,
+                purchase_id: purchase.purchase_id,
+                quantity: purchase.quantity,
+                rate: purchase.rate,
+                price: purchase.price,
+                discount: purchase.discount
+            });
+        }
+        return {purchases: purchases_list, transaction: transaction};
+    } catch (err) {
+        console.error(err);
+    }
+}
+
 async function get_transactions() {
     try {
         return await models.Transaction.find();
@@ -211,6 +235,18 @@ async function get_transaction_by_id(id) {
     }
 }
 
+async function drop_database() {
+    try {
+        models.Product.drop();
+        models.Distributor.drop();
+        models.Retailer.drop();
+        models.Transaction.drop();
+        models.Purchase.drop();
+    } catch (err) {
+        console.error(err);
+    }
+}
+
 module.exports = {
     models,
     createConnection,
@@ -224,5 +260,8 @@ module.exports = {
     createDistributor,
     createTransaction,
     get_transactions,
-    get_transaction_by_id
+    get_transaction_by_id,
+    drop_database,
+    get_bill,
+    createPurchase
 }

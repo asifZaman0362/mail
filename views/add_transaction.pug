@@ -1,0 +1,25 @@
+include ./head.pug
+script(src="billmaker.js", type="text/javascript")
+body
+    include ./header.pug
+    include ./notification.pug
+    .content.centred
+        form.login-form(action="/add_transaction", method="post", name="transaction_form")
+            h1.formheader Add transaction
+            #stuff
+                .purchase
+                    .horizontal-input-row
+                        .input-field
+                            label(for="id") Product ID
+                            input(type="text", name="id", placeholder="Enter product ID")
+                        .input-field
+                            label(for="discount") Discount
+                            input(type="number", name="discount", placeholder="Enter discount (in percentage)")
+                        .input-field
+                            label(for="quantity") Quantity
+                            input(type="number", name="quantity", placeholder="Enter quantity")
+            a.button(href="javascript:void(0)", onclick="addPurchaseRow()")
+                span Add Purchase
+            button.button(onclick="")
+                span Add transaction
+                i.fa-solid.fa-user-plus

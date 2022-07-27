@@ -203,6 +203,10 @@ app.get('/list_transaction', auth.is_editor, async (req, res) => {
     return res.status(200).render('list_transaction.pug', {list: list, username: req.session.username, usertype: req.session.usertype});
 });
 
+app.get('/add_transaction', auth.is_editor, async (req, res) => {
+    return res.status(200).render('add_transaction.pug');
+});
+
 app.get('/view_transaction', auth.is_editor, async (req, res) => {
     const id = req.body.id;
     const transaction = await database.get_transaction_by_id(id);
@@ -212,6 +216,12 @@ app.get('/view_transaction', auth.is_editor, async (req, res) => {
 app.get('*', (req, res) => {
     return res.status(404).render('404', { title: '404: Page not found!', username: req.session.username, usertype: req.session.usertype });
 });
+
+app.post('/add_transaction', auth.is_editor, async (req, res) => {
+    const id = await database.createTransaction();
+    purchases = req.purchases;
+});
+
 
 https
     .createServer(
