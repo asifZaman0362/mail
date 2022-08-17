@@ -68,7 +68,7 @@ async function get_user(username, usertype) {
 }
 
 async function createPurchase(product_id, quantity, discount, rate, price, transaction_id) {
-    const id = uuid.v5();
+    const id = uuid.v4();
     const purchase = new models.Purchase({
         purchase_id: id,
         product_id: product_id,
@@ -82,7 +82,7 @@ async function createPurchase(product_id, quantity, discount, rate, price, trans
 }
 
 async function createTransaction(seller, buyer, cost, date) {
-    const id = uuid.v5();
+    const id = uuid.v4();
     const transaction = new models.Transaction({
         transaction_id: id,
         seller_id: seller,

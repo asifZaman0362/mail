@@ -200,7 +200,7 @@ app.post('/add_product', auth.is_editor, async (req, res) => {
 
 app.get('/list_transaction', auth.is_editor, async (req, res) => {
     const list = await database.get_transactions();
-    return res.status(200).render('list_transaction.pug', {list: list, username: req.session.username, usertype: req.session.usertype});
+    return res.status(200).render('list_transaction.pug', {transactions: list, username: req.session.username, usertype: req.session.usertype});
 });
 
 app.get('/add_transaction', auth.is_editor, async (req, res) => {
@@ -219,7 +219,12 @@ app.get('*', (req, res) => {
 
 app.post('/add_transaction', auth.is_editor, async (req, res) => {
     const id = await database.createTransaction();
-    purchases = req.purchases;
+    const productids = req.ids.split(';');
+    const quantities = req.quantities.split(';');
+    const discounts = req.discounts.split(';');
+    for (let i = 0; i < productids.length; i++) {
+        const purchase_id = database.createPurchase();
+    }
 });
 
 
