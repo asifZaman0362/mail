@@ -1,7 +1,5 @@
 let count = 1;
 
-console.log('hello');
-
 function addPurchaseRow() {
     count++;
     console.log('hello')

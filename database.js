@@ -35,6 +35,7 @@ const productSchema = new mongoose.Schema({
 const purchaseSchema = new mongoose.Schema({
     purchase_id: String,
     product_id: Number,
+    product_name: String,
     quantity: Number,
     rate: Number,
     discount: Number,
@@ -67,15 +68,20 @@ async function get_user(username, usertype) {
     return models.User.findOne({ username: username, usertype: usertype });
 }
 
-async function createPurchase(product_id, quantity, discount, rate, price, transaction_id) {
+async function createPurchase(product_id, quantity, discount, transaction_id) {
     const id = uuid.v4();
+    const prod = models.Product.findOne({product_id: product_id});
+    if (!prod) {
+        return null;
+    }
     const purchase = new models.Purchase({
         purchase_id: id,
         product_id: product_id,
+        product_name: prod.product_name,
         quantity: quantity,
         discount: discount,
-        rate: rate,
-        price: price,
+        rate: prod.rate,
+        price: (prod.rate - prod.rate * discount) * quantity,
         transaction_id: transaction_id
     });
     return purchase.save();
@@ -167,6 +173,14 @@ async function get_products() {
     }
 }
 
+async function get_product_by_id(id) {
+    try {
+        return await models.Product.findOne({ product_id: id });
+    } catch (err) {
+        console.error(err);
+    }
+}
+
 async function get_distributors() {
     try {
         return await models.Distributor.find();
@@ -252,6 +266,7 @@ module.exports = {
     createConnection,
     get_user,
     get_products,
+    get_product_by_id,
     get_retailers,
     get_distributors,
     createUser,

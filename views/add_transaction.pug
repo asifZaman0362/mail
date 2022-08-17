@@ -12,6 +12,12 @@ body
                 input(name="quantities", type="text")
             #stuff
                 .purchase
+                    .input-field 
+                        label(for="buyer_id") Buyer ID
+                        input(type="text", name="buyer_id")
+                    .input-field 
+                        label(for="seller_id") Seller ID
+                        input(type="text", name="seller_id")
                     .horizontal-input-row
                         .input-field
                             label(for="id") Product ID

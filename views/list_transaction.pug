@@ -16,11 +16,16 @@ body
                             h3.table-data-interior TransactionID
                         .table-head
                             h3.table-data-interior Date
+                        .table-head 
+                            h3.table-data-interior Link
                     for transaction of transactions
                         .row.data-row
-                            .table-data.table-checkbox-container
-                                span #{transaction.transaction_id}
+                            .table-data
+                                p.table-data-interior #{transaction.transaction_id}
                             .table-data
                                 p.table-data-interior #{transaction.date}
+                            .table-data.table-checkbox-container
+                                - link_address = "view_transaction?id=" + transaction.transaction_id
+                                a.table-data-interior(href="")
             else
                 h2.message No records found!

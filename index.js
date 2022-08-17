@@ -218,13 +218,27 @@ app.get('*', (req, res) => {
 });
 
 app.post('/add_transaction', auth.is_editor, async (req, res) => {
-    const id = await database.createTransaction();
     const productids = req.ids.split(';');
     const quantities = req.quantities.split(';');
     const discounts = req.discounts.split(';');
+    let purchases = [];
+    let totalPrice = 0;
+    let totalCost = 0;
     for (let i = 0; i < productids.length; i++) {
-        const purchase_id = database.createPurchase();
+        const prod = database.get_product_by_id(productids[i]);
+        const rate = prod.retail_price;
+        const discount = 1 - (parseInt(discounts[i]) / 100);
+        const cost = rate * discount * quantities[i];
+        purchases.push({
+            p_id: productids[i],
+            rate: rate,
+            discount: discounts[i],
+            cost: cost
+        });
+        totalPrice += rate * quantities;
+        totalCost += cost;
     }
+    const transaction = database.createTransaction(req.seller_id, req.buyer_id, totalCost, Date.now());
 });
 
 
