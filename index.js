@@ -208,9 +208,17 @@ app.get('/add_transaction', auth.is_editor, async (req, res) => {
 });
 
 app.get('/view_transaction', auth.is_editor, async (req, res) => {
-    const id = req.body.id;
-    const transaction = await database.get_transaction_by_id(id);
-    res.status(200).render('transaction_view.pug', { transaction: transaction, username: req.session.username, usertype: req.session.usertype });
+    const id = req.query.id;
+    const transactionInfo = await database.get_transaction_by_id(id);
+    const purchases = transactionInfo.purchases;
+    const transaction = transactionInfo.transaction;
+    const bname = transaction.buyer;
+    const sname = transaction.seller;
+    res.status(200).render('transaction_view.pug', { 
+        transaction: transaction, buyername: bname, sellername: sname, 
+        purchases: purchases, username: req.session.username, dated: transaction.date,
+        usertype: req.session.usertype 
+    });
 });
 
 app.get('*', (req, res) => {
@@ -218,14 +226,13 @@ app.get('*', (req, res) => {
 });
 
 app.post('/add_transaction', auth.is_editor, async (req, res) => {
-    const productids = req.ids.split(';');
-    const quantities = req.quantities.split(';');
-    const discounts = req.discounts.split(';');
+    const productids = req.body.ids.split(';');
+    const quantities = req.body.quantities.split(';');
+    const discounts = req.body.discounts.split(';');
     let purchases = [];
-    let totalPrice = 0;
     let totalCost = 0;
     for (let i = 0; i < productids.length; i++) {
-        const prod = database.get_product_by_id(productids[i]);
+        const prod = await database.get_product_by_id(productids[i]);
         const rate = prod.retail_price;
         const discount = 1 - (parseInt(discounts[i]) / 100);
         const cost = rate * discount * quantities[i];
@@ -233,12 +240,18 @@ app.post('/add_transaction', auth.is_editor, async (req, res) => {
             p_id: productids[i],
             rate: rate,
             discount: discounts[i],
-            cost: cost
+            cost: cost,
+            quantity: quantities[i]
         });
-        totalPrice += rate * quantities;
         totalCost += cost;
     }
-    const transaction = database.createTransaction(req.seller_id, req.buyer_id, totalCost, Date.now());
+    console.log(totalCost);
+    const transaction = await database.createTransaction(req.body.seller_id, req.body.buyer_id, totalCost, Date.now());
+    for (let i = 0; i < purchases.length; i++) {
+        const p = purchases[i];
+        const purchase = await database.createPurchase(p.p_id, p.quantity, p.discount, transaction.transaction_id);
+    }
+    return res.status(200).redirect('/editor');
 });
 
 

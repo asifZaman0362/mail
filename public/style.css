@@ -890,3 +890,6 @@ tr:nth-child(even) {
     border: none;
     border-bottom: 1px solid var(--col-darker);
 }
+.hidden {
+    display: none;
+}

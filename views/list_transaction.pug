@@ -26,6 +26,6 @@ body
                                 p.table-data-interior #{transaction.date}
                             .table-data.table-checkbox-container
                                 - link_address = "view_transaction?id=" + transaction.transaction_id
-                                a.table-data-interior(href="")
+                                a.table-data-interior(href=link_address) view
             else
                 h2.message No records found!

@@ -53,23 +53,27 @@ function addPurchaseRow() {
 }
 
 function verifyAll() {
+    console.log('verifying purchases');
     const ids = document.forms[0].ids;
     const discounts = document.forms[0].discounts;
     const quantities = document.forms[0].quantities;
     const parents = document.getElementsByClassName('horizontal-input-row');
-    let idString = "";
-    let dstring = "";
-    let qstring = ""; 
+    let idarr = [];
+    let darr = [];
+    let qarr = []; 
     for (let i = 0; i < parents.length; i++) {
-        const id = parents[i].getElementsByClassName('id');
-        const discount = parents[i].getElementsByClassName('discount');
-        const quantity = parents[i].getElementsByClassName('quantity');
-        idString += ";" + id.value;
-        dstring += ";" + discount.value;
-        qstring += ";" + quantity.value;
+        const id = parents[i].getElementsByClassName('id')[0];
+        const discount = parents[i].getElementsByClassName('discount')[0];
+        const quantity = parents[i].getElementsByClassName('quantity')[0];
+        idarr.push(id.value);
+        darr.push(discount.value);
+        qarr.push(quantity.value);
     }
-    ids.value = idString;
-    discounts.value = dstring;
-    quantities.value = qstring;
+    ids.value = idarr.join(';');
+    discounts.value = darr.join(';');
+    quantities.value = qarr.join(';');
+    console.log(ids.value);
+    console.log(discounts.value);
+    console.log(quantities.value);
     document.forms[0].submit();
 }

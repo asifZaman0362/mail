@@ -40,13 +40,13 @@ const purchaseSchema = new mongoose.Schema({
     rate: Number,
     discount: Number,
     price: Number,
-    transaction_id: Number
+    transaction_id: String
 });
 
 const transactionSchema = new mongoose.Schema({
     transaction_id: String,
-    seller_id: Number,
-    buyer_id: Number,
+    seller: String,
+    buyer: String,
     cost: Number,
     date: Date
 });
@@ -70,18 +70,20 @@ async function get_user(username, usertype) {
 
 async function createPurchase(product_id, quantity, discount, transaction_id) {
     const id = uuid.v4();
-    const prod = models.Product.findOne({product_id: product_id});
+    const prod = await models.Product.findOne({product_id: product_id});
     if (!prod) {
         return null;
     }
+    let cost = prod.retail_price * quantity;
+    let d = discount / 100;
     const purchase = new models.Purchase({
         purchase_id: id,
         product_id: product_id,
         product_name: prod.product_name,
         quantity: quantity,
         discount: discount,
-        rate: prod.rate,
-        price: (prod.rate - prod.rate * discount) * quantity,
+        rate: prod.retail_price,
+        price: (prod.retail_price - (prod.retail_price * discount / 100)) * quantity,
         transaction_id: transaction_id
     });
     return purchase.save();
@@ -91,8 +93,8 @@ async function createTransaction(seller, buyer, cost, date) {
     const id = uuid.v4();
     const transaction = new models.Transaction({
         transaction_id: id,
-        seller_id: seller,
-        buyer_id: buyer,
+        seller: seller,
+        buyer: buyer,
         cost: cost,
         date: date
     });
@@ -116,6 +118,18 @@ async function createUser(username, usertype, password, email, phone) {
         console.error('error: ', error);
         return null;
     }
+}
+
+async function get_purchases_by_transaction(id) {
+    return models.Purchase.find({transaction_id: id});
+}
+
+async function get_distributor_by_name(name) {
+    return models.Distributor.findOne({name: name});
+}
+
+async function get_retailer_by_name(name) {
+    return models.Retailer.findOne({name: name});
 }
 
 async function createRetailer(name, email, phone, address) {
@@ -238,8 +252,9 @@ async function get_transactions() {
 
 async function get_transaction_by_id(id) {
     try {
-        const purchases = models.Purchase.find({ transaction_id: id });
-        const transaction = models.Transaction.findOne({ transaction_id: id });
+        const purchases = await models.Purchase.find({ transaction_id: id });
+        const transaction = await models.Transaction.findOne({ transaction_id: id });
+        console.log(id, transaction);
         return {
             purchases: purchases,
             transaction: transaction
@@ -278,5 +293,8 @@ module.exports = {
     get_transaction_by_id,
     drop_database,
     get_bill,
-    createPurchase
+    createPurchase,
+    get_purchases_by_transaction,
+    get_retailer_by_name,
+    get_distributor_by_name
 }

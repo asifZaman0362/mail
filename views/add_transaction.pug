@@ -13,10 +13,10 @@ body
             #stuff
                 .purchase
                     .input-field 
-                        label(for="buyer_id") Buyer ID
+                        label(for="buyer") Buyer Name
                         input(type="text", name="buyer_id")
                     .input-field 
-                        label(for="seller_id") Seller ID
+                        label(for="seller_id") Seller Name
                         input(type="text", name="seller_id")
                     .horizontal-input-row
                         .input-field
@@ -27,7 +27,7 @@ body
                             input(class="discount", type="number", name="discount", placeholder="Enter discount (in percentage)")
                         .input-field
                             label(for="quantity") Quantity
-                            input(for="quantity", type="number", name="quantity", placeholder="Enter quantity")
+                            input(class="quantity", type="number", name="quantity", placeholder="Enter quantity")
             a.button(href="javascript:void(0)", onclick="addPurchaseRow()")
                 span Add Purchase
             button.button(type="button", onclick="verifyAll()")
