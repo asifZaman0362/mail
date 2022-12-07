@@ -5,6 +5,7 @@ const fs = require('fs');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const path = require('path');
+const { Server } = require('socket.io');
 
 const database = require('./database');
 const auth = require('./auth');
@@ -254,17 +255,36 @@ app.post('/add_transaction', auth.is_editor, async (req, res) => {
     return res.status(200).redirect('/editor');
 });
 
+const server = https.createServer({
+        key: fs.readFileSync("server.key"),
+        cert: fs.readFileSync("server.cert"),
+    },
+    app
+);
 
-https
-    .createServer(
-        {
-            key: fs.readFileSync("server.key"),
-            cert: fs.readFileSync("server.cert"),
-        },
-        app
-    )
-    .listen(3000, function () {
-            console.log(
-            "Example app listening on port 3000! Go to https://localhost:3000/"
-        );
+const io = new Server(server);
+
+io.on('connection', (socket) => {
+    console.log('a user connected');
+    socket.on('logout', () => {
+        socket.key = null;
     });
+    socket.on('disconnect', () => {
+        socket.key = null;
+    });
+    socket.on('login', (password) => {
+        socket.key = password;
+    });
+    socket.on('sendMail', (mail) => {
+        const subject = mail.subject;
+        const body = mail.body;
+        const destination = mail.destination;
+        const attachment = mail.attachment;
+    });
+});
+
+server.listen(3000, function () {
+        console.log(
+        "Example app listening on port 3000! Go to https://localhost:3000/"
+    );
+});
