@@ -1,13 +1,11 @@
 include ./head.pug
 body 
-    .parent-container
-        form#login-form(name="register-form", method="POST", action="/register")
-            h1.form-header Register new user
-            select#userselect(name="usertype") Select User
-                option(value="Admin") Admin
-                option(value="Retailer") Retailer
-                option(value="Distributor") Distributor
-            .input-wrapper 
+    include ./header.pug
+    include ./notification.pug
+    .content-centred
+        form.login-form#login-form(name="register-form", method="POST", action="/register")
+            h1.formheader Register new user
+            .input-wrapper
                 label(for="username") Username
                 input(type="text", name="username", placeholder="Enter username")
             .input-wrapper 

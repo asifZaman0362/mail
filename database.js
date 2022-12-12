@@ -23,7 +23,7 @@ const models = {
 };
 
 async function createConnection() {
-    return mongoose.connect('mongodb://localhost:27017');
+    return mongoose.connect('mongodb://192.168.1.5:27017');
 }
 
 async function get_user(username, domain) {

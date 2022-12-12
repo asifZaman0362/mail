@@ -9,6 +9,8 @@ const { Server } = require('socket.io');
 
 const database = require('./database');
 const auth = require('./auth');
+const crypto = require('./crypto');
+const ws = require('ws');
 
 require('dotenv').config();
 const app = express();
@@ -76,38 +78,6 @@ app.post('/register', async (req, res) => {
     }
 });
 
-app.get('/editor', auth.is_editor, async (req, res) => {
-    return res.render('editor.pug', {username: req.session.username, usertype: req.session.usertype});
-});
-
-app.get('/admin', auth.is_editor, async (req, res) => {
-    return res.render('editor.pug', {username: req.session.username, usertype: req.session.usertype});
-});
-
-app.get('/add_product', auth.is_editor, async (req, res) => {
-    return res.render('add_product.pug', {username: req.session.username, usertype: req.session.usertype});
-});
-
-app.get('/add_retailer', auth.is_editor, async (req, res) => {
-    return res.render('addretailer.pug', {username: req.session.username, usertype: req.session.usertype});
-});
-
-app.get('/add_distributor', auth.is_editor, async (req, res) => {
-    return res.render('add_distributor.pug', {username: req.session.username, usertype: req.session.usertype});
-});
-
-app.post('/add_distributor', auth.is_editor, async (req, res) => {
-    let name = req.body.name;
-    let address = req.body.address;
-    let email = req.body.email;
-    let phone = req.body.phone;
-    let result = await database.createDistributor(name, email, phone, address);
-    if (result != null) {
-        console.log('Added distributor: ', result);
-        return res.status(200).redirect('/admin');
-    }
-});
-
 app.post('/add_retailer', auth.is_editor, async (req, res) => {
     let name = req.body.name;
     let address = req.body.address;
@@ -120,39 +90,20 @@ app.post('/add_retailer', auth.is_editor, async (req, res) => {
     }
 });
 
-app.post('/add_product', auth.is_editor, async (req, res) => {
-    let name = req.body.name;
-    let id = req.body.id;
-    let cost = req.body.manufacturing_cost;
-    let price = req.body.retail_price;
-    let stock = req.body.stock;
-    let mname = req.body.manufacturer_name;
-    let result = await database.createProduct(name, id, cost, mname, stock, price);
-    if (result != null) {
-        console.log('Added product: ', result);
-        return res.status(200).redirect('/admin');
-    }
-});
-
 app.get('/logout', (req, res) => {
     res.clearCookie('jsonwebtoken');
     req.session.destroy();
     return res.status(200).redirect('/login');
 });
 
-app.get('/list_product', auth.is_editor, async (req, res) => {
+app.get('/list_mail', auth.is_editor, async (req, res) => {
     let products = await database.get_products();
     return res.status(200).render('list_product.pug', {products: products, username: req.session.username, usertype: req.session.usertype});
 });
 
-app.get('/list_retailer', auth.is_editor, async (req, res) => {
-    let retailers = await database.get_retailers();
-    return res.status(200).render('list_retailer.pug', {retailers: retailers, username: req.session.username, usertype: req.session.usertype});
-});
-
-app.get('/list_distributor', auth.is_editor, async (req, res) => {
-    let distributors = await database.get_distributors();
-    return res.status(200).render('list_distributor.pug', {distributors: distributors, username: req.session.username, usertype: req.session.usertype});
+app.get('/list_contact', auth.is_editor, async (req, res) => {
+    let contacts = await database.get_contacts();
+    return res.status(200).render('list_contacts.pug', {retailers: retailers, username: req.session.username, usertype: req.session.usertype});
 });
 
 app.post('/login', async (req, res) => {
@@ -170,90 +121,40 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.post('/add_retailer', auth.is_editor, async (req, res) => {
+app.post('/add_contact', auth.is_editor, async (req, res) => {
     const name = req.body.name;
     const email = req.body.email;
     const phone = req.body.phone;
     const address = req.body.address;
-    await database.createRetailer(name, email, phone, address);
+    await database.createContact(name, email, phone, address);
     return res.status(200).redirect('/editor');
-});
-
-app.post('/add_distributor', auth.is_editor, async (req, res) => {
-    const name = req.body.name;
-    const email = req.body.email;
-    const phone = req.body.phone;
-    const address = req.body.address;
-    await database.createDistributor(name, email, phone, address);
-    return res.status(200).redirect('/editor');
-});
-
-app.post('/add_product', auth.is_editor, async (req, res) => {
-    const name = req.body.name;
-    const id = req.body.id;
-    const mfg_cost = req.body.manufacturing_cost;
-    const mfr = req.body.manufacturer_name;
-    const price = req.body.retail_price;
-    const stock = req.body.stock;
-    await database.createProduct(name, id, mfg_cost, mfr, stock, price);
-    return res.status(200).redirect('/editor');
-});
-
-app.get('/list_transaction', auth.is_editor, async (req, res) => {
-    const list = await database.get_transactions();
-    return res.status(200).render('list_transaction.pug', {transactions: list, username: req.session.username, usertype: req.session.usertype});
-});
-
-app.get('/add_transaction', auth.is_editor, async (req, res) => {
-    return res.status(200).render('add_transaction.pug');
-});
-
-app.get('/view_transaction', auth.is_editor, async (req, res) => {
-    const id = req.query.id;
-    const transactionInfo = await database.get_transaction_by_id(id);
-    const purchases = transactionInfo.purchases;
-    const transaction = transactionInfo.transaction;
-    const bname = transaction.buyer;
-    const sname = transaction.seller;
-    res.status(200).render('transaction_view.pug', { 
-        transaction: transaction, buyername: bname, sellername: sname, 
-        purchases: purchases, username: req.session.username, dated: transaction.date,
-        usertype: req.session.usertype 
-    });
 });
 
 app.get('*', (req, res) => {
     return res.status(404).render('404', { title: '404: Page not found!', username: req.session.username, usertype: req.session.usertype });
 });
 
-app.post('/add_transaction', auth.is_editor, async (req, res) => {
-    const productids = req.body.ids.split(';');
-    const quantities = req.body.quantities.split(';');
-    const discounts = req.body.discounts.split(';');
-    let purchases = [];
-    let totalCost = 0;
-    for (let i = 0; i < productids.length; i++) {
-        const prod = await database.get_product_by_id(productids[i]);
-        const rate = prod.retail_price;
-        const discount = 1 - (parseInt(discounts[i]) / 100);
-        const cost = rate * discount * quantities[i];
-        purchases.push({
-            p_id: productids[i],
-            rate: rate,
-            discount: discounts[i],
-            cost: cost,
-            quantity: quantities[i]
-        });
-        totalCost += cost;
-    }
-    console.log(totalCost);
-    const transaction = await database.createTransaction(req.body.seller_id, req.body.buyer_id, totalCost, Date.now());
-    for (let i = 0; i < purchases.length; i++) {
-        const p = purchases[i];
-        const purchase = await database.createPurchase(p.p_id, p.quantity, p.discount, transaction.transaction_id);
-    }
-    return res.status(200).redirect('/editor');
+const apiSocket = new ws.WebSocket("ws://localhost:4000");
+
+apiSocket.addEventListener("open", (event) => {
+    console.log("connection established");
+    // we have to send an activation message
+    apiSocket.send(JSON.stringify({
+        ActivationMessage: [
+            "zero@mail.com",
+            "zeroman"
+        ]
+    }));
 });
+
+apiSocket.addEventListener("message", (event) => {
+    console.log("message from relay: ", event.data);
+});
+
+apiSocket.addEventListener("error", (event) => {
+    console.error("error: ", event);
+});
+
 
 const server = https.createServer({
         key: fs.readFileSync("server.key"),
@@ -276,15 +177,18 @@ io.on('connection', (socket) => {
         socket.key = password;
     });
     socket.on('sendMail', (mail) => {
-        const subject = mail.subject;
-        const body = mail.body;
         const destination = mail.destination;
-        const attachment = mail.attachment;
+        apiSocket.send({
+            SendMail: {
+                next: destination,
+                mail: crypto.encrypt(mail)
+            }
+        });
     });
 });
 
-server.listen(3000, function () {
+server.listen(8080, function () {
         console.log(
-        "Example app listening on port 3000! Go to https://localhost:3000/"
+        "Example app listening on port 3000! Go to https://localhost:8080/"
     );
 });
