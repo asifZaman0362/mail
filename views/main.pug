@@ -9,15 +9,15 @@ body
                 .list-container 
                     #folder-list 
                         li 
-                            a(href="javascript:void(0);", onclick="showInbox()") Primary
+                            a(href="/inbox") Primary
                         li 
-                            a(href="javascript:void(0);", onclick="showStarred()") Starred
+                            a(href="/starred") Starred
                         li 
-                            a(href="javascript:void(0);", onclick="showDrafts()") Drafts
+                            a(href="/drafts") Drafts
                         li 
-                            a(href="javascript:void(0);", onclick="showOutbox()") Outbox
+                            a(href="/outbox") Outbox
                         li 
-                            a(href="javascript:void(0);", onclick="showTrash()") Trash
+                            a(href="/trash") Trash
         #inbox 
             #searchbar 
                 input(type="text", placeholder="Search email (enter :help for search patterns)", onkeypress="keyPress()")
@@ -39,7 +39,11 @@ body
                         h3 It looks like you have no new mail 
                 #reader-view 
                     #mail-view 
-                        h1.subject#subject Subject
+                        .heading 
+                            h1.subject#subject Subject
+                            .button-bar
+                                i#delete-button.fa-solid.fa-trash(onclick="star")
+                                i#star-button.fa-solid.fa-star(onclick="star")
                         .meta-header 
                             .author-info
                                 h2#author-name Author Name

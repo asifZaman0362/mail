@@ -179,6 +179,15 @@ async function get_users() {
     }
 }
 
+async function removeMail(id) {
+    try {
+        return await models.Email.deleteOne({mail_id: id});
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
+}
+
 async function drop_database() {
     try {
         models.Email.drop();
@@ -203,6 +212,7 @@ module.exports = {
     get_drafts,
     get_inbox,
     get_outbox,
+    removeMail,
     getUsername,
     getIdentifier,
     getName,

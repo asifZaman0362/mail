@@ -127,6 +127,12 @@ app.get('/getMail', auth.is_logged_in, async (req, res) => {
     res.status(200).send(mail);
 });
 
+app.get('/deleteMail', auth.is_logged_in, async (req, res) => {
+    let id = req.query.id;
+    await database.removeMail(id);
+    res.status(200).send("success");
+});
+
 app.get('/inbox', auth.is_logged_in, async (req, res) => {
     let mail = await axios.get("http://127.0.0.1:4000/messages?identifier=" + await database.getIdentifier() + '&password=' + await database.getIdKey());
     if (mail.data && mail.data.length > 0) {
@@ -140,6 +146,13 @@ app.get('/inbox', auth.is_logged_in, async (req, res) => {
         }
     }
     let emails = await database.get_inbox();
+    console.log(emails);
+    if (emails == null) emails = [];
+    return res.status(200).render('main.pug', {emails: emails})
+});
+
+app.get('/outbox', auth.is_logged_in, async (req, res) => {
+    let emails = await database.get_outbox();
     console.log(emails);
     if (emails == null) emails = [];
     return res.status(200).render('main.pug', {emails: emails})
