@@ -1,6 +1,5 @@
 include ./head.pug
 body 
-    include ./header.pug 
     include ./notification.pug
     #inbox-main
         #sidebar
@@ -24,26 +23,30 @@ body
                 input(type="text", placeholder="Search email (enter :help for search patterns)", onkeypress="keyPress()")
             #mail-list-view 
                 #mail-list 
-                    if mails.length > 0
+                    if emails.length > 0
                         ul 
-                            for mail of mails
+                            for mail of emails
                                 li 
-                                    a(href="javascript:void(0)", onclick="showReceivedMail(#{mail.id})") 
+                                    - var functionName = "showReceivedMail('" + mail.mail_id + "')";
+                                    a(href="javascript:void(0)", onclick=functionName).message-stub 
                                         h1.mail-title #{mail.subject}
                                         h4.sender-details #{mail.sender_name}
                                             span #{mail.sender_id}
                                         p.message-summary 
                                             #{mail.summary}
-            #reader-view 
-                #mail-view 
-                    h1.subject Subject
-                    .meta-header 
-                        .author-info
-                            h2#author-name Author Name
-                            h4#mail-address author_mail_address
-                        .meta 
-                            h5#category Category
-                            h5#time Time
-                    .message Some Message
-                    .floating.compose-button compose 
+                    else 
+                        h1 Empty Inbox 
+                        h3 It looks like you have no new mail 
+                #reader-view 
+                    #mail-view 
+                        h1.subject#subject Subject
+                        .meta-header 
+                            .author-info
+                                h2#author-name Author Name
+                                h4#mail-address author_mail_address
+                            .meta.time-info
+                                h5#category General
+                                h5#time Time
+                        .message#message-body Some Message
+                        a(href="/compose").floating.compose-button compose 
                         

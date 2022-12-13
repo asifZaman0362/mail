@@ -1,21 +1,24 @@
-include ./head.pug
+include ./head_other.pug
 body 
     include ./header.pug
     include ./notification.pug
-    .content-centred
-        form.login-form#login-form(name="register-form", method="POST", action="/register")
+    .content.centred
+        form.login-form(name="register-form", method="POST", action="/register")
             h1.formheader Register new user
-            .input-wrapper
+            .input-field 
+                label(for="firstname") First name
+                input(type="text", name="firstname", placeholder="Enter first name")
+            .input-field 
+                label(for="lastname") First name
+                input(type="text", name="lastname", placeholder="Enter last name")
+            .input-field
                 label(for="username") Username
                 input(type="text", name="username", placeholder="Enter username")
-            .input-wrapper 
+            .input-field
+                label(for="domain") Domain
+                input(type="text", name="domain", placeholder="Enter domain name")
+            .input-field 
                 label(for="password") Password
                 input(type="password", name="password", placeholder="Enter password")
-            .input-wrapper 
-                label(for="email") Email
-                input(type="email", name="email", placeholder="Enter email address")
-            .input-wrapper 
-                label(for="phone") Phone
-                input(type="phone", name="phone", placeholder="Enter phone number")
             .button-container 
                 input(type="submit", value="Register")

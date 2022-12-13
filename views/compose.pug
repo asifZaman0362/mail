@@ -1,0 +1,38 @@
+include ./head.pug
+body 
+    include ./notification.pug
+    #inbox-main
+        #sidebar
+            #textmark.smaller
+                h1 Email
+                    span .io 
+                .list-container 
+                    #folder-list 
+                        li 
+                            a(href="javascript:void(0);", onclick="showInbox()") Primary
+                        li 
+                            a(href="javascript:void(0);", onclick="showStarred()") Starred
+                        li 
+                            a(href="javascript:void(0);", onclick="showDrafts()") Drafts
+                        li 
+                            a(href="javascript:void(0);", onclick="showOutbox()") Outbox
+                        li 
+                            a(href="javascript:void(0);", onclick="showTrash()") Trash
+        #composer
+            a(href="/inbox", class="button", onclick="back()") back
+            .text-area-parent 
+                #textarea 
+                    .meta-header 
+                        #destination 
+                            h3 To: 
+                            input#destination-address(type="email", name="destination-address", placeholder="Enter receiver address")
+                        #source 
+                            h3 From: 
+                            h1 #{user.name}
+                            span#sender #{user.email}
+                    p#subject-input(contenteditable="true") Subject
+                    p#email-content-text(contenteditable="true") Write your mail here...
+                .floating-button-bar 
+                    a.button(href="javascript:void(0);", onclick="discard()") discard
+                    a.button(href="javascript:void(0);", onclick="draft()") draft
+                    a.button(href="javascript:void(0);", onclick="sendMail()") send

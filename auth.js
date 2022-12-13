@@ -12,9 +12,9 @@ async function getPasswordHash(password) {
     }
 }
 
-async function verifyPassword(username, usertype, password) {
+async function verifyPassword(username, password) {
     try {
-        const entry = await database.get_user(username, usertype);
+        const entry = await database.get_user(username);
         let hash = entry.password;
         if (hash)
             return argon2.verify(hash, password, argon2.defaults);
@@ -29,21 +29,19 @@ async function verifyPassword(username, usertype, password) {
     }
 }
 
-async function generateToken(username, usertype) {
+async function generateToken(username) {
     const user = {
         username: username,
-        usertype: usertype
     };
     return jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '5184000s' });
 }
 
-async function is_editor(req, res, next) {
+async function is_logged_in(req, res, next) {
     if (req.cookies['jsonwebtoken']) {
         const token = req.cookies['jsonwebtoken'];
-        const tokenLevel = await getAccessLevel(token);
-        if (tokenLevel === 'Admin') {
+        const authenticated = await getAccessLevel(token);
+        if (authenticated) {
             req.session.username = await getUsername(token);
-            req.session.usertype = tokenLevel;
             return next();
         }
         else return res.status(401).redirect('/login?code=401');
@@ -65,8 +63,8 @@ async function checkAccess(req, res, next) {
 
 async function getAccessLevel(token) {
     const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
-    if (decoded) return decoded.usertype;
-    else return null;
+    if (decoded) return true;
+    else return false;
 }
 
 async function getUsername(token) {
@@ -79,7 +77,7 @@ module.exports = {
     getAccessLevel,
     getPasswordHash,
     // checkAccess,
-    is_editor,
+    is_logged_in,
     generateToken,
     verifyPassword
 }
