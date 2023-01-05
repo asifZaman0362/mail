@@ -10,6 +10,13 @@ function readMail(id) {
     
 }
 
+function searchKeyPress(event) {
+    console.log(event.key);
+    if (event.key == 'Enter') {
+        onSearchMail();
+    }
+}
+
 function deleteMail(id) {
     console.log('del');
     var request = new XMLHttpRequest();
@@ -46,11 +53,81 @@ function deleteMail(id) {
 }
 
 function starMail(id) {
-    
+    console.log('star');
+    var request = new XMLHttpRequest();
+    request.open("GET", "https://localhost:8080/star?id=" + id);
+    request.setRequestHeader('Content-type', 'application/json');
+    request.send();
+    //EVENT HANDLERS
+
+    //triggered when the response is completed
+    request.onload = function() {
+      if (request.status === 200) {
+          //parse JSON datax`x
+          //data = JSON.parse(request.responseText)
+          location.replace('/inbox');
+      } else if (request.status === 404) {
+          console.log("No records found")
+      }
+    }
+
+    //triggered when a network-level error occurs with the request
+    request.onerror = function() {
+        console.log("Network error occurred")
+    }
+
+    //triggered periodically as the client receives data
+    //used to monitor the progress of the request
+    request.onprogress = function(e) {
+      if (e.lengthComputable) {
+          console.log(`${e.loaded} B of ${e.total} B loaded!`)
+      } else {
+          console.log(`${e.loaded} B loaded!`)
+      }
+    }
 }
 
 function onReceiveMail(mail) {
     
+}
+
+function onSearchMail() {
+    let searchterm = document.getElementById("search-bar").value;
+    //var request = new XMLHttpRequest();
+    window.location = "https://localhost:8080/search?searchPattern=" + searchterm;
+    /*request.open("GET", "https://localhost:8080/search?searchPattern=" + searchterm);
+    request.setRequestHeader('Content-type', 'application/json');
+    request.send();
+    //EVENT HANDLERS
+
+    //triggered when the response is completed
+    request.onload = function() {
+      if (request.status === 200) {
+          //parse JSON datax`x
+          //data = JSON.parse(request.responseText)
+          console.log(request.responseText);
+          data = JSON.parse(request.responseText);
+          //location.replace(data);
+          console.log(data);
+      } else if (request.status === 404) {
+          console.log("No records found")
+      }
+    }
+
+    //triggered when a network-level error occurs with the request
+    request.onerror = function() {
+        console.log("Network error occurred")
+    }
+
+    //triggered periodically as the client receives data
+    //used to monitor the progress of the request
+    request.onprogress = function(e) {
+      if (e.lengthComputable) {
+          console.log(`${e.loaded} B of ${e.total} B loaded!`)
+      } else {
+          console.log(`${e.loaded} B loaded!`)
+      }
+    }*/
 }
 
 function showReceivedMail(id) {
@@ -76,6 +153,8 @@ function showReceivedMail(id) {
           let body_e = document.getElementById('message-body');
           let del = document.getElementById('delete-button');
           let star = document.getElementById('star-button');
+          if (data.star) star.style.color = 'orange';
+          else star.style.color = 'black';
           del.onclick = () => {deleteMail(id)};
           star.onclick = () => {starMail(id)};
           subject_e.innerHTML = data.subject;
@@ -107,8 +186,8 @@ function showReceivedMail(id) {
 function sendMail() {
     var request = new XMLHttpRequest();
     var target = document.getElementById("destination-address").value;
-    var subject = document.getElementById("subject-input").innerHTML;
-    var body = document.getElementById("email-content-text").innerHTML;
+    var subject = document.getElementById("subject-input").innerHTML.replace('<br>', '');
+    var body = document.getElementById("email-content-text").innerHTML.replace('<br>', '');
     var sender = document.getElementById("sender").innerHTML;
     request.open("POST", "https://localhost:8080/sendMail");
     request.setRequestHeader('Content-type', 'application/json');

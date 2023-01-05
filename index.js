@@ -37,6 +37,8 @@ app.use(cors({
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
+currentMailbox = [];
+
 app.get('/', async (req, res) => {
     try {
         let token = '';
@@ -133,6 +135,57 @@ app.get('/deleteMail', auth.is_logged_in, async (req, res) => {
     res.status(200).send("success");
 });
 
+app.get('/star', auth.is_logged_in, async (req, res) => {
+    console.log('starring ', req.query.id);
+    let id = req.query.id;
+    await database.toggle_star(id);
+    res.status(200).send("success");
+});
+
+/*
+    Search patterns:
+    to: regex; from: regex; subject: regex; body: regex; date_start: date; date_end: date;
+
+*/
+app.get('/search', auth.is_logged_in, async (req, res) => {
+    try {
+        let searchPattern = req.query.searchPattern;
+        let toRegex = /to:[a-zA-Z0-9@]*;?/;
+        let fromRegex = /from:[a-zA-Z0-9@]*;?/;
+        let subjectRegex = /subject:*;?/;
+        let bodyRegex = /body:*;?/;
+        let filter = currentMailbox.filter( mail => {
+            let result = false;
+            let to = toRegex.exec(searchPattern);
+            if (to) {
+                let dest = to[0].split(':')[1].split(';')[0];
+                result |= mail.destination.match(dest) != null;
+            }
+            let from = fromRegex.exec(searchPattern);
+            if (from) {
+                let sender = from[0].split(':')[1].split(';')[0];
+                result |= mail.sender_id.match(sender) != null;
+            }
+            let subject = subjectRegex.exec(searchPattern);
+            if (subject) {
+                let sub = subject[0].split(':')[1].split(';')[0];
+                result |= mail.subject.match(sub) != null;
+            }
+            let body = bodyRegex.exec(searchPattern);
+            if (body) {
+                let bod = body[0].split(':')[1].split(';')[0];
+                result |= mail.body.match(bod) != null;
+            }
+            return result;
+        });
+        console.log('found emails', filter);
+        return res.status(200).render('main.pug', { emails: filter });
+    } catch (error) {
+        console.error(error);
+        res.status(200).redirect('/inbox');
+    }
+});
+
 app.get('/inbox', auth.is_logged_in, async (req, res) => {
     let mail = await axios.get("http://127.0.0.1:4000/messages?identifier=" + await database.getIdentifier() + '&password=' + await database.getIdKey());
     if (mail.data && mail.data.length > 0) {
@@ -146,15 +199,22 @@ app.get('/inbox', auth.is_logged_in, async (req, res) => {
         }
     }
     let emails = await database.get_inbox();
-    console.log(emails);
     if (emails == null) emails = [];
+    currentMailbox = emails;
     return res.status(200).render('main.pug', {emails: emails})
 });
 
 app.get('/outbox', auth.is_logged_in, async (req, res) => {
     let emails = await database.get_outbox();
-    console.log(emails);
     if (emails == null) emails = [];
+    currentMailbox = emails;
+    return res.status(200).render('main.pug', {emails: emails})
+});
+
+app.get('/starred', auth.is_logged_in, async (req, res) => {
+    let emails = await database.get_starred();
+    if (emails == null) emails = [];
+    currentMailbox = emails;
     return res.status(200).render('main.pug', {emails: emails})
 });
 
@@ -169,7 +229,6 @@ app.post('/login', async (req, res) => {
     if (await auth.verifyPassword(username, password)) {
         let token = await auth.generateToken(username);
         res.cookie('jsonwebtoken', token, { maxAge: 60*60*24*60, httpOnly: true });
-        console.log('logged in');
         return res.status(200).redirect('/');
     } else {
         return res.status(401).redirect('/login?code=401');
@@ -187,7 +246,6 @@ app.get('*', (req, res) => {
 const apiSocket = new ws.WebSocket("ws://localhost:4000");
 
 apiSocket.addEventListener("open", async (event) => {
-    console.log("connection established");
     // we have to send an activation message
     apiSocket.send(JSON.stringify({
         ActivationMessage: [

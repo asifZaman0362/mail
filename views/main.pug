@@ -20,7 +20,7 @@ body
                             a(href="/trash") Trash
         #inbox 
             #searchbar 
-                input(type="text", placeholder="Search email (enter :help for search patterns)", onkeypress="keyPress()")
+                input#search-bar(type="text", placeholder="Search email ([to:, from:, subject:, body:])", onkeypress="searchKeyPress(event)")
             #mail-list-view 
                 #mail-list 
                     if emails.length > 0
@@ -42,12 +42,12 @@ body
                         .heading 
                             h1.subject#subject Subject
                             .button-bar
-                                i#delete-button.fa-solid.fa-trash(onclick="star")
-                                i#star-button.fa-solid.fa-star(onclick="star")
+                                i#delete-button.fa-solid.fa-trash
+                                i#star-button.fa-solid.fa-star
                         .meta-header 
                             .author-info
                                 h2#author-name Author Name
-                                h4#mail-address author_mail_address
+                                h4#mail-address author email address
                             .meta.time-info
                                 h5#category General
                                 h5#time Time

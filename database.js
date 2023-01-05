@@ -16,7 +16,8 @@ const mailSchema = new mongoose.Schema({
     body: String,
     sender_id: String,
     destination: String,
-    date: String
+    date: String,
+    star: Boolean
 });
 
 const models = {
@@ -58,9 +59,9 @@ async function createMail(subject, body, sender_id, destination, date) {
             body: body,
             sender_id: sender_id,
             destination: destination,
-            date: date
+            date: date,
+            star: false
         });
-        console.log(mail);
         return mail.save();
     } catch (error) {
         console.error('error saving mail: ', error);
@@ -93,7 +94,7 @@ async function getIdKey() {
         const user = await models.User.findOne();
         return user.id_key;
     } catch (err) {
-        console.log(err);
+        console.error(err);
         return null;
     }
 }
@@ -146,7 +147,19 @@ async function get_drafts() {
 
 async function get_starred() {
     try {
-        return await models.Email.find({ starred: true });
+        return await models.Email.find({ star: true });
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
+}
+
+async function toggle_star(id) {
+    try {
+        let found = await models.Email.findOne({mail_id: id});
+        console.log(found);
+        await models.Email.findOneAndUpdate({mail_id: id}, { star: !found.star });
+        return true;
     } catch (err) {
         console.error(err);
         return null;
@@ -216,5 +229,6 @@ module.exports = {
     getUsername,
     getIdentifier,
     getName,
-    getIdKey
+    getIdKey,
+    toggle_star
 }
